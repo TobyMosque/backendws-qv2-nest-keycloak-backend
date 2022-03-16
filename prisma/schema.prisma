@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client  {
+  provider                        = "prisma-client-js"
+}
+
+generator nestjsDto  {
+  provider                        = "prisma-generator-nestjs-dto"
+  output                          = "../src"
+  outputToNestJsResourceStructure = "true"
+  reExport                        = "true"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://admin:P455b017.S3rv3r@tobiasmesquita.dev:24832/postgres?schema=public"
+}
+
+model Job {
+  jobId     String   @default(uuid()) @id
+  name      String
+
+  people    Person[]
+
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+  revision  String   @unique @default(uuid())
+}
+
+model Company {
+  companyId String   @default(uuid()) @id
+  name      String
+
+  people    Person[]
+
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+  revision  String   @unique @default(uuid())
+}
+
+model Person {
+  personId  String   @default(uuid()) @id
+  avatar    String
+  firstName String
+  lastName  String
+  email     String
+
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [jobId])
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [companyId])
+
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+  revision  String   @unique @default(uuid())
+}

@@ -1,16 +1,13 @@
-import { Body, Get, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { TokenDto } from './dto/token';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller()
 export class AuthController {
   constructor(private readonly appService: AuthService) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
 
   @Post('refresh')
   refresh(

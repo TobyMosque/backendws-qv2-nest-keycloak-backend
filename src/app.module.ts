@@ -1,6 +1,9 @@
 import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
+import { JobModule } from './job/job.module';
+import { CompanyModule } from './company/company.module';
+import { PersonModule } from './person/person.module';
 import {
   KeycloakConnectModule,
   ResourceGuard,
@@ -11,6 +14,9 @@ import {
 @Module({
   imports: [
     AuthModule,
+    JobModule,
+    CompanyModule,
+    PersonModule,
     KeycloakConnectModule.register({
       authServerUrl: 'https://oidc.tobiasmesquita.dev/auth',
       realm: 'quasar-rxdb-realm',

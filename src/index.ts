@@ -9,6 +9,10 @@ import {
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AuthModule } from './auth/auth.module';
+import { JobModule } from './job/job.module';
+import { CompanyModule } from './company/company.module';
+import { PersonModule } from './person/person.module';
 
 interface RenderParams {
   req: Request;
@@ -59,9 +63,10 @@ export default async function bootstrap({
     .setTitle('Quasar Nest example')
     .setDescription('The cats API description')
     .setVersion('1.0')
-    .addTag('cats')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    include: [AuthModule, JobModule, CompanyModule, PersonModule],
+  });
   SwaggerModule.setup(`${prefix}/docs`, app, document);
   return app;
 }
