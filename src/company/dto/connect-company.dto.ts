@@ -1,6 +1,4 @@
-
-  export class ConnectCompanyDto {
-    companyId?: string;
-revision?: string;
-  }
-  
+export class ConnectCompanyDto {
+  companyId?: string;
+  revision?: string;
+}

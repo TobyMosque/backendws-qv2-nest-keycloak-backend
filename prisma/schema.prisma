@@ -18,46 +18,74 @@ datasource db {
 }
 
 model Job {
-  jobId     String   @default(uuid()) @id
+  jobId     String   @db.Uuid @default(uuid()) @id
   name      String
 
+  /// @DtoRelationCanCreateOnCreate
+  /// @DtoRelationCanConnectOnCreate
+  /// @DtoRelationCanCreateOnUpdate
+  /// @DtoRelationCanConnectOnUpdate
   people    Person[]
 
+  /// @DtoReadOnly
   isDeleted Boolean  @default(false)
+  /// @DtoReadOnly
   createdAt DateTime @default(now())
+  /// @DtoReadOnly
   updatedAt DateTime @default(now())
+  /// @DtoReadOnly
   deletedAt DateTime?
   revision  String   @unique @default(uuid())
 }
 
 model Company {
-  companyId String   @default(uuid()) @id
+  companyId String   @db.Uuid @default(uuid()) @id
   name      String
 
+  /// @DtoRelationCanCreateOnCreate
+  /// @DtoRelationCanConnectOnCreate
+  /// @DtoRelationCanCreateOnUpdate
+  /// @DtoRelationCanConnectOnUpdate
   people    Person[]
 
+  /// @DtoReadOnly
   isDeleted Boolean  @default(false)
+  /// @DtoReadOnly
   createdAt DateTime @default(now())
+  /// @DtoReadOnly
   updatedAt DateTime @default(now())
+  /// @DtoReadOnly
   deletedAt DateTime?
   revision  String   @unique @default(uuid())
 }
 
 model Person {
-  personId  String   @default(uuid()) @id
+  personId  String   @db.Uuid @default(uuid()) @id
   avatar    String
   firstName String
   lastName  String
   email     String
 
-  jobId     String
+  jobId     String   @db.Uuid
+  /// @DtoRelationCanCreateOnCreate
+  /// @DtoRelationCanConnectOnCreate
+  /// @DtoRelationCanCreateOnUpdate
+  /// @DtoRelationCanConnectOnUpdate
   job       Job      @relation(fields: [jobId], references: [jobId])
-  companyId String
+  companyId String   @db.Uuid
+  /// @DtoRelationCanCreateOnCreate
+  /// @DtoRelationCanConnectOnCreate
+  /// @DtoRelationCanCreateOnUpdate
+  /// @DtoRelationCanConnectOnUpdate
   company   Company  @relation(fields: [companyId], references: [companyId])
 
+  /// @DtoReadOnly
   isDeleted Boolean  @default(false)
+  /// @DtoReadOnly
   createdAt DateTime @default(now())
+  /// @DtoReadOnly
   updatedAt DateTime @default(now())
+  /// @DtoReadOnly
   deletedAt DateTime?
   revision  String   @unique @default(uuid())
 }

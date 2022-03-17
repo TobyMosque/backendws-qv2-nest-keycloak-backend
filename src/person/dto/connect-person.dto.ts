@@ -1,6 +1,4 @@
-
-  export class ConnectPersonDto {
-    personId?: string;
-revision?: string;
-  }
-  
+export class ConnectPersonDto {
+  personId?: string;
+  revision?: string;
+}
