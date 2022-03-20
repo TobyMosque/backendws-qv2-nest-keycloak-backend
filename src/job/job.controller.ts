@@ -6,17 +6,15 @@ import {
   Query,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { JobService } from './job.service';
-import {
-  JobFindRequestDto,
-  JobQueryRequestDto,
-  JobAggregateRequestDto,
-} from './dto/request.dto';
-import { JobAggregateResponseDto } from './dto/response.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { JobQueryRequestDto, JobFindRequestDto } from './dto/request.dto';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Job } from './entities';
 import { CreateJobDto, UpdateJobDto } from './dto';
+import { QueryObjectTrasform } from 'src/pipes/object.transform';
 
 @ApiTags('job')
 @Controller('job')
@@ -26,33 +24,49 @@ export class JobController {
   @Get(':id')
   find(
     @Param('id') id: string,
-    @Query() params: JobFindRequestDto,
+    @Query(QueryObjectTrasform) params: JobFindRequestDto,
   ): Promise<Job> {
     return this.jobService.find(id, params);
   }
 
   @Get()
-  query(@Query() params: JobQueryRequestDto): Promise<Job[]> {
-    return this.jobService.query(params);
-  }
-
-  @Get('aggregate')
-  aggregate(@Query() params: JobAggregateRequestDto): JobAggregateResponseDto {
-    return this.jobService.aggregate(params);
+  @ApiQuery({ name: 'count', required: false })
+  query(
+    @Query(QueryObjectTrasform) params: JobQueryRequestDto,
+    @Query('count') count?: boolean,
+  ): Promise<{ data: Job[]; count?: number }> {
+    return this.jobService.query(params, count);
   }
 
   @Put()
-  update(@Body() data: CreateJobDto): Promise<Job> {
+  create(@Body() data: CreateJobDto): Promise<Job> {
     return this.jobService.create(data);
   }
 
   @Put(':id')
-  insert(@Param('id') id: string, @Body() data: UpdateJobDto): Promise<Job> {
-    return this.jobService.update(id, data);
+  @ApiQuery({ name: 'rev', required: false })
+  async update(
+    @Param('id') id: string,
+    @Body() data: UpdateJobDto,
+    @Query('rev') rev?: string,
+  ): Promise<Job> {
+    const result = await this.jobService.update(id, data, rev);
+    if (typeof result === 'number') {
+      throw new HttpException(HttpStatus[result], result);
+    }
+    return result;
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<Job> {
-    return this.jobService.delete(id);
+  @ApiQuery({ name: 'rev', required: false })
+  async delete(
+    @Param('id') id: string,
+    @Query('rev') rev?: string,
+  ): Promise<Job> {
+    const result = await this.jobService.delete(id, rev);
+    if (typeof result === 'number') {
+      throw new HttpException(HttpStatus[result], result);
+    }
+    return result;
   }
 }

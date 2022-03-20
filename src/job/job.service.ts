@@ -1,11 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  JobQueryRequestDto,
-  JobAggregateRequestDto,
-  JobFindRequestDto,
-} from './dto/request.dto';
-import { JobAggregateResponseDto } from './dto/response.dto';
+import { JobQueryRequestDto, JobFindRequestDto } from './dto/request.dto';
 import { Job } from './entities';
 import { CreateJobDto, UpdateJobDto } from './dto';
 
@@ -17,7 +12,7 @@ export class JobService {
     if (params.select && params.include) {
       delete params.include;
     }
-    return this.prisma.job.findUnique({
+    return this.prisma.job.findFirst({
       where: {
         jobId: id,
       },
@@ -25,22 +20,35 @@ export class JobService {
     });
   }
 
-  query(params: JobQueryRequestDto): Promise<Job[]> {
+  async query(
+    params: JobQueryRequestDto,
+    count?: boolean,
+  ): Promise<{ data: Job[]; count?: number }> {
     if (params.select && params.include) {
       delete params.include;
     }
-    return this.prisma.job.findMany(params);
-  }
-
-  aggregate(params: JobAggregateRequestDto): JobAggregateResponseDto {
-    return this.prisma.job.aggregate(params);
+    const result: { data: Job[]; count?: number } = { data: [] };
+    result.data = await this.prisma.job.findMany(params);
+    if (count) {
+      const { cursor, where } = params;
+      result.count = await this.prisma.job.count({ cursor, where });
+    }
+    return result;
   }
 
   create(data: CreateJobDto): Promise<Job> {
     return this.prisma.job.create({ data });
   }
 
-  update(id: string, data: UpdateJobDto): Promise<Job> {
+  async update(
+    id: string,
+    data: UpdateJobDto,
+    rev?: string,
+  ): Promise<Job | HttpStatus> {
+    const status = await this.checkRev(id, rev);
+    if (status !== HttpStatus.OK) {
+      return status;
+    }
     return this.prisma.job.update({
       where: {
         jobId: id,
@@ -49,11 +57,29 @@ export class JobService {
     });
   }
 
-  delete(id: string): Promise<Job> {
+  async delete(id: string, rev?: string): Promise<Job | HttpStatus> {
+    const status = await this.checkRev(id, rev);
+    if (status !== HttpStatus.OK) {
+      return status;
+    }
     return this.prisma.job.delete({
       where: {
         jobId: id,
       },
     });
+  }
+
+  async checkRev(id: string, rev?: string): Promise<HttpStatus> {
+    if (rev) {
+      const { revision } = await this.find(id, {
+        select: {
+          revision: true,
+        },
+      });
+      if (revision !== rev) {
+        return HttpStatus.CONFLICT;
+      }
+    }
+    return HttpStatus.OK;
   }
 }

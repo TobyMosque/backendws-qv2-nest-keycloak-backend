@@ -1,11 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  PersonQueryRequestDto,
-  PersonAggregateRequestDto,
-  PersonFindRequestDto,
-} from './dto/request.dto';
-import { PersonAggregateResponseDto } from './dto/response.dto';
+import { PersonQueryRequestDto, PersonFindRequestDto } from './dto/request.dto';
 import { Person } from './entities';
 import { CreatePersonDto, UpdatePersonDto } from './dto';
 
@@ -17,7 +12,7 @@ export class PersonService {
     if (params.select && params.include) {
       delete params.include;
     }
-    return this.prisma.person.findUnique({
+    return this.prisma.person.findFirst({
       where: {
         personId: id,
       },
@@ -25,22 +20,35 @@ export class PersonService {
     });
   }
 
-  query(params: PersonQueryRequestDto): Promise<Person[]> {
+  async query(
+    params: PersonQueryRequestDto,
+    count?: boolean,
+  ): Promise<{ data: Person[]; count?: number }> {
     if (params.select && params.include) {
       delete params.include;
     }
-    return this.prisma.person.findMany(params);
-  }
-
-  aggregate(params: PersonAggregateRequestDto): PersonAggregateResponseDto {
-    return this.prisma.person.aggregate(params);
+    const result: { data: Person[]; count?: number } = { data: [] };
+    result.data = await this.prisma.person.findMany(params);
+    if (count) {
+      const { cursor, where } = params;
+      result.count = await this.prisma.person.count({ cursor, where });
+    }
+    return result;
   }
 
   create(data: CreatePersonDto): Promise<Person> {
     return this.prisma.person.create({ data: data as never });
   }
 
-  update(id: string, data: UpdatePersonDto): Promise<Person> {
+  async update(
+    id: string,
+    data: UpdatePersonDto,
+    rev?: string,
+  ): Promise<Person | HttpStatus> {
+    const status = await this.checkRev(id, rev);
+    if (status !== HttpStatus.OK) {
+      return status;
+    }
     return this.prisma.person.update({
       where: {
         personId: id,
@@ -49,11 +57,29 @@ export class PersonService {
     });
   }
 
-  delete(id: string): Promise<Person> {
+  async delete(id: string, rev?: string): Promise<Person | HttpStatus> {
+    const status = await this.checkRev(id, rev);
+    if (status !== HttpStatus.OK) {
+      return status;
+    }
     return this.prisma.person.delete({
       where: {
         personId: id,
       },
     });
+  }
+
+  async checkRev(id: string, rev?: string): Promise<HttpStatus> {
+    if (rev) {
+      const { revision } = await this.find(id, {
+        select: {
+          revision: true,
+        },
+      });
+      if (revision !== rev) {
+        return HttpStatus.CONFLICT;
+      }
+    }
+    return HttpStatus.OK;
   }
 }

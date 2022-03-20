@@ -18,12 +18,11 @@ datasource db {
 }
 
 model Job {
+  /// @DtoCreateOptional
   jobId     String   @db.Uuid @default(uuid()) @id
   name      String
 
-  /// @DtoRelationCanCreateOnCreate
   /// @DtoRelationCanConnectOnCreate
-  /// @DtoRelationCanCreateOnUpdate
   /// @DtoRelationCanConnectOnUpdate
   people    Person[]
 
@@ -35,16 +34,15 @@ model Job {
   updatedAt DateTime @default(now())
   /// @DtoReadOnly
   deletedAt DateTime?
-  revision  String   @unique @default(uuid())
+  revision  String   @db.Uuid @default(uuid())
 }
 
 model Company {
+  /// @DtoCreateOptional
   companyId String   @db.Uuid @default(uuid()) @id
   name      String
 
-  /// @DtoRelationCanCreateOnCreate
   /// @DtoRelationCanConnectOnCreate
-  /// @DtoRelationCanCreateOnUpdate
   /// @DtoRelationCanConnectOnUpdate
   people    Person[]
 
@@ -56,10 +54,11 @@ model Company {
   updatedAt DateTime @default(now())
   /// @DtoReadOnly
   deletedAt DateTime?
-  revision  String   @unique @default(uuid())
+  revision  String   @db.Uuid @default(uuid())
 }
 
 model Person {
+  /// @DtoCreateOptional
   personId  String   @db.Uuid @default(uuid()) @id
   avatar    String
   firstName String
@@ -67,15 +66,11 @@ model Person {
   email     String
 
   jobId     String   @db.Uuid
-  /// @DtoRelationCanCreateOnCreate
   /// @DtoRelationCanConnectOnCreate
-  /// @DtoRelationCanCreateOnUpdate
   /// @DtoRelationCanConnectOnUpdate
   job       Job      @relation(fields: [jobId], references: [jobId])
   companyId String   @db.Uuid
-  /// @DtoRelationCanCreateOnCreate
   /// @DtoRelationCanConnectOnCreate
-  /// @DtoRelationCanCreateOnUpdate
   /// @DtoRelationCanConnectOnUpdate
   company   Company  @relation(fields: [companyId], references: [companyId])
 
@@ -87,5 +82,8 @@ model Person {
   updatedAt DateTime @default(now())
   /// @DtoReadOnly
   deletedAt DateTime?
-  revision  String   @unique @default(uuid())
+  revision  String   @db.Uuid @default(uuid())
+
+  @@index([jobId])
+  @@index([companyId])
 }

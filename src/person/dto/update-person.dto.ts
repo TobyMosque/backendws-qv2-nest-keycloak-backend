@@ -1,23 +1,17 @@
 import { ApiExtraModels } from '@nestjs/swagger';
-import { CreateJobDto } from '../../job/dto/create-job.dto';
 import { ConnectJobDto } from '../../job/dto/connect-job.dto';
-import { CreateCompanyDto } from '../../company/dto/create-company.dto';
 import { ConnectCompanyDto } from '../../company/dto/connect-company.dto';
 
 export class UpdatePersonJobRelationInputDto {
-  create?: CreateJobDto;
-  connect?: ConnectJobDto;
+  connect: ConnectJobDto;
 }
 export class UpdatePersonCompanyRelationInputDto {
-  create?: CreateCompanyDto;
-  connect?: ConnectCompanyDto;
+  connect: ConnectCompanyDto;
 }
 
 @ApiExtraModels(
-  CreateJobDto,
   ConnectJobDto,
   UpdatePersonJobRelationInputDto,
-  CreateCompanyDto,
   ConnectCompanyDto,
   UpdatePersonCompanyRelationInputDto,
 )

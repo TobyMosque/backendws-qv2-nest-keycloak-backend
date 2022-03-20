@@ -1,18 +1,13 @@
 import { ApiExtraModels } from '@nestjs/swagger';
-import { CreatePersonDto } from '../../person/dto/create-person.dto';
 import { ConnectPersonDto } from '../../person/dto/connect-person.dto';
 
 export class CreateCompanyPeopleRelationInputDto {
-  create?: CreatePersonDto[];
-  connect?: ConnectPersonDto[];
+  connect: ConnectPersonDto[];
 }
 
-@ApiExtraModels(
-  CreatePersonDto,
-  ConnectPersonDto,
-  CreateCompanyPeopleRelationInputDto,
-)
+@ApiExtraModels(ConnectPersonDto, CreateCompanyPeopleRelationInputDto)
 export class CreateCompanyDto {
+  companyId?: string;
   name: string;
   people?: CreateCompanyPeopleRelationInputDto;
 }

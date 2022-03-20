@@ -1,4 +1,3 @@
 export class ConnectCompanyDto {
-  companyId?: string;
-  revision?: string;
+  companyId: string;
 }

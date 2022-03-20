@@ -6,17 +6,15 @@ import {
   Query,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { PersonService } from './person.service';
-import {
-  PersonFindRequestDto,
-  PersonQueryRequestDto,
-  PersonAggregateRequestDto,
-} from './dto/request.dto';
-import { PersonAggregateResponseDto } from './dto/response.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { PersonFindRequestDto, PersonQueryRequestDto } from './dto/request.dto';
+import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { Person } from './entities';
 import { CreatePersonDto, UpdatePersonDto } from './dto';
+import { QueryObjectTrasform } from 'src/pipes/object.transform';
 
 @ApiTags('person')
 @Controller('person')
@@ -26,38 +24,49 @@ export class PersonController {
   @Get(':id')
   find(
     @Param('id') id: string,
-    @Query() params: PersonFindRequestDto,
+    @Query(QueryObjectTrasform) params: PersonFindRequestDto,
   ): Promise<Person> {
     return this.personService.find(id, params);
   }
 
   @Get()
-  query(@Query() params: PersonQueryRequestDto): Promise<Person[]> {
-    return this.personService.query(params);
-  }
-
-  @Get('aggregate')
-  aggregate(
-    @Query() params: PersonAggregateRequestDto,
-  ): PersonAggregateResponseDto {
-    return this.personService.aggregate(params);
+  @ApiQuery({ name: 'count', required: false })
+  query(
+    @Query(QueryObjectTrasform) params: PersonQueryRequestDto,
+    @Query('count') count?: boolean,
+  ): Promise<{ data: Person[]; count?: number }> {
+    return this.personService.query(params, count);
   }
 
   @Put()
-  update(@Body() data: CreatePersonDto): Promise<Person> {
+  create(@Body() data: CreatePersonDto): Promise<Person> {
     return this.personService.create(data);
   }
 
   @Put(':id')
-  insert(
+  @ApiQuery({ name: 'rev', required: false })
+  async update(
     @Param('id') id: string,
     @Body() data: UpdatePersonDto,
+    @Query('rev') rev?: string,
   ): Promise<Person> {
-    return this.personService.update(id, data);
+    const result = await this.personService.update(id, data, rev);
+    if (typeof result === 'number') {
+      throw new HttpException(HttpStatus[result], result);
+    }
+    return result;
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<Person> {
-    return this.personService.delete(id);
+  @ApiQuery({ name: 'rev', required: false })
+  async delete(
+    @Param('id') id: string,
+    @Query('rev') rev?: string,
+  ): Promise<Person> {
+    const result = await this.personService.delete(id, rev);
+    if (typeof result === 'number') {
+      throw new HttpException(HttpStatus[result], result);
+    }
+    return result;
   }
 }
