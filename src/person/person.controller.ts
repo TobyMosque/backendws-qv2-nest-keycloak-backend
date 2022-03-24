@@ -15,9 +15,11 @@ import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { Person } from './entities';
 import { CreatePersonDto, UpdatePersonDto } from './dto';
 import { QueryObjectTrasform } from 'src/pipes/object.transform';
+import { Unprotected } from 'nest-keycloak-connect';
 
 @ApiTags('person')
 @Controller('person')
+@Unprotected()
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
