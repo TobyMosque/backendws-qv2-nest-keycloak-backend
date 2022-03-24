@@ -1,8 +1,5 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient, Prisma, Job, Company, Person } from '@prisma/client';
-import { CreateJobDto } from 'src/job/dto';
-import { CreateCompanyDto } from 'src/company/dto';
-import { CreatePersonDto } from 'src/person/dto';
 import { v4 as uid } from 'uuid';
 
 type Entity = Partial<{

@@ -7,12 +7,13 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { AuthModule } from './auth/auth.module';
-import { JobModule } from './job/job.module';
-import { CompanyModule } from './company/company.module';
-import { PersonModule } from './person/person.module';
+import { getOpenApiSpec } from './openapi';
+import { writeFile } from 'fs';
+import { promisify } from 'util';
+
+const writeFileAsync = promisify(writeFile);
 
 interface RenderParams {
   req: Request;
@@ -59,18 +60,13 @@ export default async function bootstrap({
   app.setGlobalPrefix(prefix);
   app.useGlobalFilters(new HttpExceptionFilter(prefix, render));
 
-  const config = new DocumentBuilder()
-    .setTitle('Quasar Nest example')
-    .setDescription('The cats API description')
-    .setVersion('1.0')
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'access-token',
-    )
-    .build();
-  const document = SwaggerModule.createDocument(app, config, {
-    include: [AuthModule, JobModule, CompanyModule, PersonModule],
-  });
+  const document = await getOpenApiSpec({ app });
   SwaggerModule.setup(`${prefix}/docs`, app, document);
+
+  if (process.env.GENERATE_OPENAPI_CLIENT) {
+    await writeFileAsync('./swagger.json', JSON.stringify(document, null, 2));
+    throw new Error('we had the swagger.json');
+  }
+
   return app;
 }
