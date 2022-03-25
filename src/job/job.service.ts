@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JobQueryRequestDto, JobFindRequestDto } from './dto/request.dto';
 import { Job } from './entities';
 import { CreateJobDto, UpdateJobDto } from './dto';
+import { JobQueryResponseDto } from './dto/response.dto';
 
 @Injectable()
 export class JobService {
@@ -23,11 +24,11 @@ export class JobService {
   async query(
     params: JobQueryRequestDto,
     count?: boolean,
-  ): Promise<{ data: Job[]; count?: number }> {
+  ): Promise<JobQueryResponseDto> {
     if (params.select && params.include) {
       delete params.include;
     }
-    const result: { data: Job[]; count?: number } = { data: [] };
+    const result: JobQueryResponseDto = { data: [] };
     result.data = await this.prisma.job.findMany(params);
     if (count) {
       const { cursor, where } = params;

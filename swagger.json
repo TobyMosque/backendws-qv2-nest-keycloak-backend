@@ -224,7 +224,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobQueryResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -446,7 +453,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyQueryResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -668,7 +682,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonQueryResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -889,6 +910,23 @@
           "revision"
         ]
       },
+      "JobQueryResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
       "ConnectPersonDto": {
         "type": "object",
         "properties": {
@@ -956,6 +994,23 @@
           }
         }
       },
+      "CompanyQueryResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Company"
+            }
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
       "CreateCompanyPeopleRelationInputDto": {
         "type": "object",
         "properties": {
@@ -1011,6 +1066,23 @@
             "$ref": "#/components/schemas/UpdateCompanyPeopleRelationInputDto"
           }
         }
+      },
+      "PersonQueryResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Person"
+            }
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data"
+        ]
       },
       "ConnectJobDto": {
         "type": "object",

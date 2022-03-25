@@ -14,11 +14,12 @@ import {
   CompanyQueryRequestDto,
   CompanyFindRequestDto,
 } from './dto/request.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Company } from './entities';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto';
 import { Unprotected } from 'nest-keycloak-connect';
 import { QueryObjectTrasform } from 'src/pipes/object.transform';
+import { CompanyQueryResponseDto } from './dto/response.dto';
 
 @ApiTags('company')
 @Controller('company')
@@ -36,10 +37,11 @@ export class CompanyController {
 
   @Get()
   @ApiQuery({ name: 'count', required: false })
+  @ApiOkResponse({ type: () => CompanyQueryResponseDto })
   query(
     @Query(QueryObjectTrasform) params: CompanyQueryRequestDto,
     @Query('count') count?: boolean,
-  ): Promise<{ data: Company[]; count?: number }> {
+  ): Promise<CompanyQueryResponseDto> {
     return this.companyService.query(params, count);
   }
 

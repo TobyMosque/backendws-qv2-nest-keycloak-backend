@@ -11,10 +11,11 @@ import {
 } from '@nestjs/common';
 import { JobService } from './job.service';
 import { JobQueryRequestDto, JobFindRequestDto } from './dto/request.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { Job } from './entities';
 import { CreateJobDto, UpdateJobDto } from './dto';
 import { QueryObjectTrasform } from 'src/pipes/object.transform';
+import { JobQueryResponseDto } from './dto/response.dto';
 
 @ApiTags('job')
 @Controller('job')
@@ -31,10 +32,11 @@ export class JobController {
 
   @Get()
   @ApiQuery({ name: 'count', required: false })
+  @ApiOkResponse({ type: () => JobQueryResponseDto })
   query(
     @Query(QueryObjectTrasform) params: JobQueryRequestDto,
     @Query('count') count?: boolean,
-  ): Promise<{ data: Job[]; count?: number }> {
+  ): Promise<JobQueryResponseDto> {
     return this.jobService.query(params, count);
   }
 

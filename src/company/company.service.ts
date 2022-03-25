@@ -7,7 +7,7 @@ import {
 import { Company } from './entities';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto';
 import { Prisma } from '@prisma/client';
-
+import { CompanyQueryResponseDto } from './dto/response.dto';
 @Injectable()
 export class CompanyService {
   constructor(private prisma: PrismaService) {}
@@ -27,11 +27,11 @@ export class CompanyService {
   async query(
     params: CompanyQueryRequestDto,
     count?: boolean,
-  ): Promise<{ data: Company[]; count?: number }> {
+  ): Promise<CompanyQueryResponseDto> {
     if (params.select && params.include) {
       delete params.include;
     }
-    const result: { data: Company[]; count?: number } = { data: [] };
+    const result: CompanyQueryResponseDto = { data: [] };
     result.data = await this.prisma.company.findMany(params);
     if (count) {
       const { cursor, where } = params;

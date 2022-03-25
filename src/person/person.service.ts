@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PersonQueryRequestDto, PersonFindRequestDto } from './dto/request.dto';
 import { Person } from './entities';
 import { CreatePersonDto, UpdatePersonDto } from './dto';
+import { PersonQueryResponseDto } from './dto/response.dto';
 
 @Injectable()
 export class PersonService {
@@ -23,11 +24,11 @@ export class PersonService {
   async query(
     params: PersonQueryRequestDto,
     count?: boolean,
-  ): Promise<{ data: Person[]; count?: number }> {
+  ): Promise<PersonQueryResponseDto> {
     if (params.select && params.include) {
       delete params.include;
     }
-    const result: { data: Person[]; count?: number } = { data: [] };
+    const result: PersonQueryResponseDto = { data: [] };
     result.data = await this.prisma.person.findMany(params);
     if (count) {
       const { cursor, where } = params;

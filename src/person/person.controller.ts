@@ -11,11 +11,12 @@ import {
 } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { PersonFindRequestDto, PersonQueryRequestDto } from './dto/request.dto';
-import { ApiTags, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiQuery, ApiOkResponse } from '@nestjs/swagger';
 import { Person } from './entities';
 import { CreatePersonDto, UpdatePersonDto } from './dto';
 import { QueryObjectTrasform } from 'src/pipes/object.transform';
 import { Unprotected } from 'nest-keycloak-connect';
+import { PersonQueryResponseDto } from './dto/response.dto';
 
 @ApiTags('person')
 @Controller('person')
@@ -33,10 +34,11 @@ export class PersonController {
 
   @Get()
   @ApiQuery({ name: 'count', required: false })
+  @ApiOkResponse({ type: () => PersonQueryResponseDto })
   query(
     @Query(QueryObjectTrasform) params: PersonQueryRequestDto,
     @Query('count') count?: boolean,
-  ): Promise<{ data: Person[]; count?: number }> {
+  ): Promise<PersonQueryResponseDto> {
     return this.personService.query(params, count);
   }
 
