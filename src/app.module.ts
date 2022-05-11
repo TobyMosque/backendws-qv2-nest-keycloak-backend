@@ -21,7 +21,7 @@ import {
       authServerUrl: 'https://oidc.tobiasmesquita.dev/auth',
       realm: 'quasar-rxdb-realm',
       clientId: 'nestjs-be-app',
-      secret: 'WoaF2NKXalmJOsqBL9c1ssB5epSzlHMs',
+      secret: 'ij8loIWBRncTsMFtAq29F2gvkKMdayBD',
     }),
   ],
   providers: [

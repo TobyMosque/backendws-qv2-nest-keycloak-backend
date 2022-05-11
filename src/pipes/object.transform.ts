@@ -12,7 +12,11 @@ export class QueryObjectTrasform implements PipeTransform {
     for (const key in value) {
       const cur = value[key];
       if (cur && typeof cur === 'string') {
-        value[key] = JSON.parse(cur);
+        try {
+          value[key] = JSON.parse(cur);
+        } catch {
+          // do nothing
+        }
       }
     }
     delete value.count;

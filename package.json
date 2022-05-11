@@ -17,7 +17,7 @@
     "build:openapi": "yarn build && yarn openapi",
     "openapi:copy": "ts-node ./openapi.ts",
     "openapi:json": "GENERATE_OPENAPI_CLIENT=true nest start",
-    "openapi:generate": "openapi-generator-cli generate -i ./swagger.json -g typescript-axios -o ../api --skip-validate-spec --additional-properties npmName=api",
+    "openapi:generate": "openapi-generator-cli generate -i ./swagger.json -g typescript-axios -o ../api --skip-validate-spec --additional-properties=npmName=api,supportsES6=true,npmVersion=\"1.0.0\"",
     "openapi": "yarn openapi:json || yarn openapi:generate && yarn openapi:copy",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "prettier": "prettier . --write",
